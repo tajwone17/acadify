@@ -19,6 +19,9 @@ import {
   Award,
   IdCard,
   Clock,
+  ArrowRight,
+  CheckCircle,
+  ArrowLeft,
 } from "lucide-react";
 
 // ─── Cover Page Component ─────────────────────────────────────────────────────
@@ -79,7 +82,14 @@ function CoverPage({ data, printRef }) {
             height: "14px",
             borderColor: "#1F9688",
             borderStyle: "solid",
-            borderWidth: pos.includes("top") ? "2px 0 0 2px" : "0 2px 2px 0",
+            borderWidth:
+              pos === "top-left"
+                ? "2px 0 0 2px"
+                : pos === "top-right"
+                  ? "2px 2px 0 0"
+                  : pos === "bottom-left"
+                    ? "0 0 2px 2px"
+                    : "0 2px 2px 0", // bottom-right
             top: pos.includes("top") ? "14mm" : "auto",
             bottom: pos.includes("bottom") ? "14mm" : "auto",
             left: pos.includes("left") ? "14mm" : "auto",
@@ -252,6 +262,9 @@ function CoverPage({ data, printRef }) {
           </p>
         </div>
 
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
         {/* Submitted To / By Grid */}
         <div
           style={{
@@ -259,7 +272,7 @@ function CoverPage({ data, printRef }) {
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "6mm",
-            marginBottom: "8mm",
+            marginBottom: "6mm",
           }}
         >
           {/* Submitted To */}
@@ -434,12 +447,12 @@ function FormInput({
   type = "text",
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <label
-        className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest"
-        style={{ color: "#99D5D5" }}
+        className="flex items-center gap-2 text-xs font-medium"
+        style={{ color: "#cbd5e1" }}
       >
-        <Icon size={11} />
+        <Icon size={13} strokeWidth={2.5} />
         {label}
       </label>
       <input
@@ -447,20 +460,23 @@ function FormInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-lg text-sm outline-none transition-all duration-200 placeholder-slate-500"
+        className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none transition-all duration-200"
         style={{
-          backgroundColor: "rgba(31, 150, 136, 0.07)",
-          border: "1px solid rgba(153, 213, 213, 0.15)",
-          color: "#e2f4f4",
+          backgroundColor: "rgba(15, 23, 42, 0.6)",
+          border: "1px solid rgba(51, 65, 85, 0.8)",
+          color: "#e2e8f0",
           fontFamily: "inherit",
+          boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.3)",
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = "rgba(31, 150, 136, 0.6)";
-          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(31, 150, 136, 0.1)";
+          e.currentTarget.style.borderColor = "#8b5cf6";
+          e.currentTarget.style.boxShadow =
+            "0 0 0 3px rgba(139, 92, 246, 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.3)";
         }}
         onBlur={(e) => {
-          e.currentTarget.style.borderColor = "rgba(153, 213, 213, 0.15)";
-          e.currentTarget.style.boxShadow = "none";
+          e.currentTarget.style.borderColor = "rgba(51, 65, 85, 0.8)";
+          e.currentTarget.style.boxShadow =
+            "inset 0 1px 3px rgba(0, 0, 0, 0.3)";
         }}
       />
     </div>
@@ -468,18 +484,27 @@ function FormInput({
 }
 
 // ─── Section Card Component ────────────────────────────────────────────────────
-function SectionCard({ title, gradient, children }) {
+function SectionCard({ title, children }) {
   return (
     <div
       className="rounded-xl overflow-hidden"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(153, 213, 213, 0.1)",
-        backdropFilter: "blur(12px)",
+        background:
+          "linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)",
+        border: "1px solid rgba(100, 116, 139, 0.3)",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        backdropFilter: "blur(8px)",
       }}
     >
-      <div className={`px-4 py-2.5 ${gradient}`}>
-        <p className="text-xs font-bold uppercase tracking-widest text-white/90">
+      <div
+        className="px-4 py-3"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))",
+          borderBottom: "1px solid rgba(100, 116, 139, 0.2)",
+        }}
+      >
+        <p className="text-xs font-semibold text-slate-100 tracking-wide">
           {title}
         </p>
       </div>
@@ -488,8 +513,234 @@ function SectionCard({ title, gradient, children }) {
   );
 }
 
+// ─── Home Page Component ───────────────────────────────────────────────────────
+function HomePage({ onGetStarted }) {
+  const [showDeveloper, setShowDeveloper] = useState(false);
+
+  return (
+    <div
+      className="min-h-screen flex flex-col p-6"
+      style={{
+        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        fontFamily: "'Inter', 'DM Sans', 'Segoe UI', system-ui, sans-serif",
+      }}
+    >
+      {/* Main Content - Centered */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        {/* Logo and Title */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-2xl blur-xl"></div>
+              <img
+                src="/logo.png"
+                alt="Acadify Logo"
+                className="w-24 h-24 rounded-2xl relative z-10"
+                style={{ boxShadow: "0 8px 16px rgba(0, 0, 0, 0.4)" }}
+              />
+            </div>
+          </div>
+          <h1
+            className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text"
+            style={{ WebkitTextFillColor: "transparent" }}
+          >
+            Acadify
+          </h1>
+          <p className="text-xl text-slate-300 mb-2">
+            Academic Document Creator
+          </p>
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
+            Create professional cover pages for your assignments and lab reports
+            in seconds
+          </p>
+        </div>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl w-full">
+          {[
+            {
+              icon: FileText,
+              title: "Professional Templates",
+              desc: "University-standard cover page designs",
+            },
+            {
+              icon: Sparkles,
+              title: "Live Preview",
+              desc: "See your changes in real-time",
+            },
+            {
+              icon: Printer,
+              title: "Print Ready",
+              desc: "Export to PDF instantly",
+            },
+          ].map((feature, idx) => (
+            <div
+              key={idx}
+              className="p-6 rounded-xl text-center"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.7))",
+                border: "1px solid rgba(100, 116, 139, 0.3)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <div className="flex justify-center mb-4">
+                <div
+                  className="p-3 rounded-lg"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2))",
+                  }}
+                >
+                  <feature.icon size={24} className="text-blue-400" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-white mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-slate-400">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Get Started Button */}
+        <button
+          onClick={onGetStarted}
+          className="flex items-center gap-3 px-8 py-4 rounded-xl text-lg font-semibold text-white transition-all duration-200 hover:shadow-2xl hover:shadow-blue-500/40 active:scale-95"
+          style={{
+            background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+            boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
+          }}
+        >
+          Get Started <ArrowRight size={20} />
+        </button>
+      </div>
+
+      {/* Footer - Aligned at Bottom */}
+      <div className="text-center py-6 border-t border-slate-700/30 mt-8">
+        <div className="flex items-center justify-center gap-4 text-xs text-slate-400 mb-2">
+          <p>Made with ❤️ for NEUB Students</p>
+        </div>
+        <button
+          onClick={() => setShowDeveloper(true)}
+          className="text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium"
+        >
+          Meet the Developer →
+        </button>
+      </div>
+
+      {/* Developer Modal */}
+      {showDeveloper && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{
+            background: "rgba(0, 0, 0, 0.7)",
+            backdropFilter: "blur(4px)",
+          }}
+          onClick={() => setShowDeveloper(false)}
+        >
+          <div
+            className="p-8 rounded-xl max-w-md w-full relative"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))",
+              border: "1px solid rgba(100, 116, 139, 0.3)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowDeveloper(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+            {/* Developer Profile Picture */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div
+                  className="absolute inset-0 rounded-full blur-lg"
+                  style={{
+                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                    opacity: 0.3,
+                  }}
+                ></div>
+                <div
+                  className="w-24 h-24 rounded-full relative z-10 flex items-center justify-center text-white text-3xl font-bold"
+                  style={{
+                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                    boxShadow: "0 8px 20px rgba(59, 130, 246, 0.4)",
+                  }}
+                >
+                  {/* Replace this div with an img tag when you have a photo */}
+                  {/* <img src="/developer.jpg" alt="Developer" className="w-24 h-24 rounded-full object-cover" /> */}
+                  JT
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-white mb-2">Developer</h3>
+              <div
+                className="w-20 h-0.5 mx-auto"
+                style={{
+                  background: "linear-gradient(90deg, #3b82f6, #8b5cf6)",
+                }}
+              ></div>
+            </div>
+
+            <div className="space-y-4 text-center">
+              <div>
+                <p className="text-sm text-slate-400 mb-1">Name</p>
+                <p className="text-lg font-semibold text-slate-200">
+                  Jakaria Chowdhury Tajwone
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-400 mb-1">Department</p>
+                <p className="text-base font-medium text-slate-200">
+                  Computer Science & Engineering
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-400 mb-1">Institution</p>
+                <p className="text-base font-medium text-slate-200">
+                  North East University Bangladesh
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-slate-700/50">
+                <p className="text-xs text-slate-500">
+                  Developed for NEUB Students
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function Page() {
+  const [currentView, setCurrentView] = useState("home"); // "home" or "editor"
+  const [currentStep, setCurrentStep] = useState(1); // 1, 2, 3, 4
   const printRef = useRef(null);
   const [form, setForm] = useState({
     docType: "ASSIGNMENT",
@@ -535,126 +786,72 @@ export default function Page() {
     }, 500);
   };
 
-  return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{
-        background:
-          "linear-gradient(135deg, #000d1a 0%, #001B2E 50%, #012840 100%)",
-        fontFamily: "'DM Sans', 'Segoe UI', system-ui, sans-serif",
-      }}
-    >
-      {/* Header */}
-      <header
-        className="px-6 py-4 flex items-center justify-between"
-        style={{ borderBottom: "1px solid rgba(153, 213, 213, 0.1)" }}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #1F9688, #0a6b5e)" }}
-          >
-            <BookOpen size={16} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-wide text-white">
-              NEUB Cover Page Generator
-            </h1>
-            <p className="text-xs" style={{ color: "#99D5D5" }}>
-              Academic Document Creator
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-            style={{
-              background: "rgba(31,150,136,0.15)",
-              border: "1px solid rgba(31,150,136,0.3)",
-              color: "#1F9688",
-            }}
-          >
-            <Sparkles size={10} /> Live Preview
-          </span>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95"
-            style={{ background: "linear-gradient(135deg, #1F9688, #0a6b5e)" }}
-          >
-            <Printer size={14} /> Print / Save PDF
-          </button>
-        </div>
-      </header>
+  // Show home page
+  if (currentView === "home") {
+    return <HomePage onGetStarted={() => setCurrentView("editor")} />;
+  }
 
-      {/* Main Split Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* ── Left: Form Panel ─────────────────────────────────── */}
-        <div
-          className="w-96 flex-shrink-0 overflow-y-auto p-5 space-y-4"
-          style={{ borderRight: "1px solid rgba(153, 213, 213, 0.08)" }}
-        >
-          {/* Doc Type Toggle */}
-          <SectionCard
-            title="Document Type"
-            gradient="bg-gradient-to-r from-emerald-700 to-teal-600"
-          >
-            <div className="grid grid-cols-2 gap-2">
-              {["ASSIGNMENT", "LAB REPORT"].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => update("docType")(type)}
-                  className="py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-200"
-                  style={
-                    form.docType === type
-                      ? {
-                          background:
-                            "linear-gradient(135deg, #1F9688, #0a6b5e)",
-                          color: "#fff",
-                          border: "1px solid #1F9688",
-                          boxShadow: "0 0 16px rgba(31,150,136,0.3)",
-                        }
-                      : {
-                          background: "rgba(31,150,136,0.07)",
-                          color: "#99D5D5",
-                          border: "1px solid rgba(153,213,213,0.15)",
-                        }
-                  }
-                >
-                  {type === "ASSIGNMENT" ? (
-                    <>
-                      <FileText size={12} className="inline mr-1" />
-                      Assignment
-                    </>
-                  ) : (
-                    <>
-                      <FlaskConical size={12} className="inline mr-1" />
-                      Lab Report
-                    </>
-                  )}
-                </button>
-              ))}
-            </div>
-          </SectionCard>
+  // Multi-step form sections
+  const renderFormStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <>
+            <SectionCard title="Document Type">
+              <div className="grid grid-cols-2 gap-2">
+                {["ASSIGNMENT", "LAB REPORT"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => update("docType")(type)}
+                    className="py-3 rounded-lg text-xs font-semibold transition-all duration-200"
+                    style={
+                      form.docType === type
+                        ? {
+                            background:
+                              "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                            color: "#fff",
+                            border: "1px solid transparent",
+                            boxShadow:
+                              "0 4px 12px rgba(59, 130, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.2)",
+                            transform: "translateY(-1px)",
+                          }
+                        : {
+                            background: "rgba(15, 23, 42, 0.5)",
+                            color: "#94a3b8",
+                            border: "1px solid rgba(51, 65, 85, 0.8)",
+                          }
+                    }
+                  >
+                    {type === "ASSIGNMENT" ? (
+                      <>
+                        <FileText size={12} className="inline mr-1" />
+                        Assignment
+                      </>
+                    ) : (
+                      <>
+                        <FlaskConical size={12} className="inline mr-1" />
+                        Lab Report
+                      </>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </SectionCard>
 
-          {/* University Info */}
-          <SectionCard
-            title="University & Department"
-            gradient="bg-gradient-to-r from-blue-700 to-indigo-600"
-          >
-            <FormInput
-              label="Department Name"
-              icon={Building2}
-              value={form.departmentName}
-              onChange={update("departmentName")}
-              placeholder="Dept. of Computer Science & Engineering"
-            />
-          </SectionCard>
-
-          {/* Course Info */}
-          <SectionCard
-            title="Course Information"
-            gradient="bg-gradient-to-r from-violet-700 to-purple-600"
-          >
+            <SectionCard title="University & Department">
+              <FormInput
+                label="Department Name"
+                icon={Building2}
+                value={form.departmentName}
+                onChange={update("departmentName")}
+                placeholder="Dept. of Computer Science & Engineering"
+              />
+            </SectionCard>
+          </>
+        );
+      case 2:
+        return (
+          <SectionCard title="Course Information">
             <div className="grid grid-cols-2 gap-3">
               <FormInput
                 label="Course Code"
@@ -679,12 +876,10 @@ export default function Page() {
               placeholder="Decision Tree Algorithm"
             />
           </SectionCard>
-
-          {/* Submitted To */}
-          <SectionCard
-            title="Submitted To"
-            gradient="bg-gradient-to-r from-orange-700 to-amber-600"
-          >
+        );
+      case 3:
+        return (
+          <SectionCard title="Submitted To">
             <FormInput
               label="Teacher Name"
               icon={GraduationCap}
@@ -700,66 +895,230 @@ export default function Page() {
               placeholder="Head & Associate Professor"
             />
           </SectionCard>
-
-          {/* Submitted By */}
-          <SectionCard
-            title="Submitted By"
-            gradient="bg-gradient-to-r from-rose-700 to-pink-600"
-          >
-            <FormInput
-              label="Student Name"
-              icon={User}
-              value={form.studentName}
-              onChange={update("studentName")}
-              placeholder="Md. Rakib Hassan"
-            />
-            <div className="grid grid-cols-2 gap-3">
+        );
+      case 4:
+        return (
+          <>
+            <SectionCard title="Submitted By">
               <FormInput
-                label="Registration ID"
-                icon={IdCard}
-                value={form.registrationId}
-                onChange={update("registrationId")}
-                placeholder="2021-1-60-003"
+                label="Student Name"
+                icon={User}
+                value={form.studentName}
+                onChange={update("studentName")}
+                placeholder="Md. Rakib Hassan"
               />
+              <div className="grid grid-cols-2 gap-3">
+                <FormInput
+                  label="Registration ID"
+                  icon={IdCard}
+                  value={form.registrationId}
+                  onChange={update("registrationId")}
+                  placeholder="2021-1-60-003"
+                />
+                <FormInput
+                  label="Roll No."
+                  icon={Hash}
+                  value={form.rollNo}
+                  onChange={update("rollNo")}
+                  placeholder="2021331060003"
+                />
+              </div>
               <FormInput
-                label="Roll No."
-                icon={Hash}
-                value={form.rollNo}
-                onChange={update("rollNo")}
-                placeholder="2021331060003"
+                label="Semester"
+                icon={Clock}
+                value={form.semester}
+                onChange={update("semester")}
+                placeholder="8th Semester"
               />
-            </div>
-            <FormInput
-              label="Semester"
-              icon={Clock}
-              value={form.semester}
-              onChange={update("semester")}
-              placeholder="8th Semester"
-            />
-          </SectionCard>
+            </SectionCard>
 
-          {/* Date */}
-          <SectionCard
-            title="Submission Date"
-            gradient="bg-gradient-to-r from-slate-600 to-slate-500"
+            <SectionCard title="Submission Date">
+              <FormInput
+                label="Date"
+                icon={Calendar}
+                value={form.date}
+                onChange={update("date")}
+                placeholder=""
+                type="date"
+              />
+            </SectionCard>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        fontFamily: "'Inter', 'DM Sans', 'Segoe UI', system-ui, sans-serif",
+      }}
+    >
+      {/* Header */}
+      <header
+        className="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0"
+        style={{
+          borderBottom: "1px solid rgba(148, 163, 184, 0.15)",
+          backgroundColor: "rgba(30, 41, 59, 0.8)",
+          backdropFilter: "blur(12px)",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setCurrentView("home")}
+            className="p-2 rounded-lg transition-all duration-200 hover:bg-slate-700/50 active:scale-95"
+            title="Back to Home"
           >
-            <FormInput
-              label="Date"
-              icon={Calendar}
-              value={form.date}
-              onChange={update("date")}
-              placeholder=""
-              type="date"
+            <ArrowLeft size={20} className="text-slate-300" />
+          </button>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg blur"></div>
+            <img
+              src="/logo.png"
+              alt="Acadify Logo"
+              className="w-10 h-10 rounded-lg relative z-10"
+              style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)" }}
             />
-          </SectionCard>
-
-          {/* Print Button bottom */}
+          </div>
+          <div>
+            <h1 className="text-lg font-bold tracking-tight text-white">
+              Acadify
+            </h1>
+            <p className="text-xs hidden sm:block" style={{ color: "#94a3b8" }}>
+              Academic Document Creator
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <span
+            className="hidden md:flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1))",
+              border: "1px solid rgba(139, 92, 246, 0.3)",
+              color: "#a78bfa",
+              boxShadow: "0 0 15px rgba(139, 92, 246, 0.15)",
+            }}
+          >
+            <Sparkles size={10} /> Live Preview
+          </span>
           <button
             onClick={handlePrint}
-            className="w-full py-3 rounded-xl font-bold text-sm text-white tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200 hover:opacity-90 active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex-1 sm:flex-none justify-center"
             style={{
-              background: "linear-gradient(135deg, #1F9688 0%, #0a6b5e 100%)",
-              boxShadow: "0 4px 20px rgba(31,150,136,0.3)",
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+            }}
+          >
+            <Printer size={14} />{" "}
+            <span className="hidden sm:inline">Print / Save PDF</span>
+            <span className="sm:hidden">Print</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Split Layout */}
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+        {/* ── Left: Form Panel ─────────────────────────────────── */}
+        <div
+          className="w-full lg:w-96 lg:flex-shrink-0 overflow-y-auto p-4 sm:p-6 space-y-4"
+          style={{
+            borderRight: "1px solid rgba(148, 163, 184, 0.15)",
+            background:
+              "linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%)",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          {/* Step Indicator */}
+          <div className="flex items-center justify-between mb-6">
+            {[1, 2, 3, 4].map((step) => (
+              <div key={step} className="flex items-center flex-1">
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all duration-200"
+                  style={
+                    step <= currentStep
+                      ? {
+                          background:
+                            "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                          color: "#fff",
+                          boxShadow: "0 2px 8px rgba(59, 130, 246, 0.4)",
+                        }
+                      : {
+                          background: "rgba(51, 65, 85, 0.5)",
+                          color: "#64748b",
+                        }
+                  }
+                >
+                  {step < currentStep ? <CheckCircle size={16} /> : step}
+                </div>
+                {step < 4 && (
+                  <div
+                    className="flex-1 h-0.5 mx-2"
+                    style={{
+                      background:
+                        step < currentStep
+                          ? "linear-gradient(90deg, #3b82f6, #8b5cf6)"
+                          : "rgba(51, 65, 85, 0.5)",
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Form Content */}
+          {renderFormStep()}
+
+          {/* Navigation Buttons */}
+          <div className="flex gap-3 pt-4">
+            {currentStep > 1 && (
+              <button
+                onClick={() => setCurrentStep((s) => s - 1)}
+                className="flex-1 py-3 rounded-lg font-semibold text-sm text-slate-300 transition-all duration-200 hover:bg-slate-700/50 active:scale-95 flex items-center justify-center gap-2"
+                style={{
+                  background: "rgba(51, 65, 85, 0.5)",
+                  border: "1px solid rgba(100, 116, 139, 0.3)",
+                }}
+              >
+                <ArrowLeft size={16} /> Previous
+              </button>
+            )}
+            {currentStep < 4 ? (
+              <button
+                onClick={() => setCurrentStep((s) => s + 1)}
+                className="flex-1 py-3 rounded-lg font-semibold text-sm text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex items-center justify-center gap-2"
+                style={{
+                  background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+                }}
+              >
+                Next <ArrowRight size={16} />
+              </button>
+            ) : (
+              <button
+                onClick={handlePrint}
+                className="flex-1 py-3 rounded-lg font-semibold text-sm text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex items-center justify-center gap-2"
+                style={{
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                }}
+              >
+                <Printer size={16} /> Generate PDF
+              </button>
+            )}
+          </div>
+
+          {/* Print Button for mobile */}
+          <button
+            onClick={handlePrint}
+            className="w-full py-3.5 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 lg:hidden"
+            style={{
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
             }}
           >
             <Printer size={16} /> Generate & Print PDF
@@ -768,33 +1127,44 @@ export default function Page() {
 
         {/* ── Right: Preview Panel ──────────────────────────────── */}
         <div
-          className="flex-1 flex flex-col items-center justify-start overflow-y-auto py-8 px-6"
+          className="flex-1 flex flex-col items-center justify-start overflow-y-auto py-4 sm:py-8 px-4 sm:px-6"
           style={{
             background:
-              "radial-gradient(ellipse at top, rgba(31,150,136,0.04) 0%, transparent 70%)",
+              "radial-gradient(ellipse at top, rgba(59, 130, 246, 0.04) 0%, transparent 50%), linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, #0f172a 100%)",
           }}
         >
           {/* Preview label */}
-          <div className="flex items-center gap-2 mb-6">
-            <Eye size={14} style={{ color: "#1F9688" }} />
+          <div
+            className="flex items-center gap-2.5 mb-4 sm:mb-6 px-4 py-2 rounded-full"
+            style={{
+              background: "rgba(30, 41, 59, 0.5)",
+              border: "1px solid rgba(100, 116, 139, 0.2)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <Eye size={14} style={{ color: "#a78bfa" }} />
             <span
-              className="text-xs font-bold uppercase tracking-widest"
-              style={{ color: "#99D5D5" }}
+              className="text-xs font-semibold"
+              style={{ color: "#cbd5e1" }}
             >
               Live A4 Preview
             </span>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div
+              className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"
+              style={{
+                boxShadow: "0 0 8px rgba(167, 139, 250, 0.6)",
+              }}
+            />
           </div>
 
           {/* A4 Paper Shadow */}
           <div
+            className="preview-container"
             style={{
               boxShadow:
-                "0 20px 60px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)",
-              borderRadius: "2px",
-              transform: "scale(0.7)",
-              transformOrigin: "top center",
-              marginBottom: "-88mm",
+                "0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(59, 130, 246, 0.15), 0 0 1px rgba(139, 92, 246, 0.4)",
+              borderRadius: "4px",
+              border: "1px solid rgba(100, 116, 139, 0.2)",
             }}
           >
             <CoverPage data={form} printRef={printRef} />
@@ -803,11 +1173,52 @@ export default function Page() {
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(0,27,46,0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(31,150,136,0.4); border-radius: 10px; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7) sepia(1) saturate(2) hue-rotate(140deg); cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+        ::-webkit-scrollbar-thumb { 
+          background: linear-gradient(180deg, #3b82f6, #8b5cf6); 
+          border-radius: 10px;
+          border: 2px solid rgba(15, 23, 42, 0.5);
+        }
+        ::-webkit-scrollbar-thumb:hover { 
+          background: linear-gradient(180deg, #60a5fa, #a78bfa); 
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator { 
+          filter: invert(0.7) sepia(1) saturate(2) hue-rotate(200deg); 
+          cursor: pointer; 
+        }
+        button:hover {
+          transform: translateY(-1px);
+        }
+        
+        /* Responsive preview scaling */
+        .preview-container {
+          transform: scale(0.7);
+          transform-origin: top center;
+          margin-bottom: -88mm;
+        }
+        
+        @media (max-width: 1024px) {
+          .preview-container {
+            transform: scale(0.5);
+            margin-bottom: -148mm;
+          }
+        }
+        
+        @media (max-width: 640px) {
+          .preview-container {
+            transform: scale(0.35);
+            margin-bottom: -192mm;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .preview-container {
+            transform: scale(0.28);
+            margin-bottom: -213mm;
+          }
+        }
       `}</style>
     </div>
   );
