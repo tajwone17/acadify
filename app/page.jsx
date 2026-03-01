@@ -406,12 +406,18 @@ function CoverPage({ data, printRef }) {
               <p
                 style={{ fontSize: "10px", color: "#555", marginBottom: "2px" }}
               >
-                <strong>ID:</strong> {data.registrationId || "XXXX-XX-XXXX"}
+                <strong>ID:</strong>{" "}
+                <span style={{ color: "#555", textDecoration: "none" }}>
+                  {data.registrationId || "XXXX-XX-XXXX"}
+                </span>
               </p>
               <p
                 style={{ fontSize: "10px", color: "#555", marginBottom: "2px" }}
               >
-                <strong>Roll:</strong> {data.rollNo || "XXXX"}
+                <strong>Roll:</strong>{" "}
+                <span style={{ color: "#555", textDecoration: "none" }}>
+                  {data.rollNo || "XXXX"}
+                </span>
               </p>
               <p style={{ fontSize: "10px", color: "#555" }}>
                 <strong>Semester:</strong> {data.semester || "Xth Semester"}
