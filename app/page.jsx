@@ -54,6 +54,29 @@ function CoverPage({ data, printRef }) {
         alignItems: "center",
       }}
     >
+      {/* Watermark */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          opacity: 0.06,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <img
+          src="/NEUB%20Logo.png"
+          alt="Watermark"
+          style={{
+            width: "450px",
+            height: "450px",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+
       {/* Double-line border */}
       <div
         style={{
@@ -595,9 +618,7 @@ function HomePage({ onGetStarted }) {
                   <feature.icon size={24} className="text-blue-400" />
                 </div>
               </div>
-              <h3 className="font-semibold text-white mb-2">
-                {feature.title}
-              </h3>
+              <h3 className="font-semibold text-white mb-2">{feature.title}</h3>
               <p className="text-sm text-slate-400">{feature.desc}</p>
             </div>
           ))}
@@ -671,28 +692,37 @@ function HomePage({ onGetStarted }) {
             {/* Developer Profile Picture */}
             <div className="flex justify-center mb-6">
               <div className="relative">
+                {/* Glow Effect */}
                 <div
                   className="absolute inset-0 rounded-full blur-lg"
                   style={{
                     background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                    opacity: 0.3,
+                    opacity: 0.4,
                   }}
                 ></div>
+
+                {/* Gradient Border */}
                 <div
-                  className="w-24 h-24 rounded-full relative z-10 flex items-center justify-center text-white text-3xl font-bold"
+                  className="relative rounded-full p-1"
                   style={{
-                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                    boxShadow: "0 8px 20px rgba(59, 130, 246, 0.4)",
+                    background:
+                      "linear-gradient(135deg, #3b82f6, #8b5cf6, #3b82f6)",
+                    boxShadow:
+                      "0 8px 30px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1)",
                   }}
                 >
-                  {/* Replace this div with an img tag when you have a photo */}
-                  {/* <img src="/developer.jpg" alt="Developer" className="w-24 h-24 rounded-full object-cover" /> */}
-                  JT
+                  <div className="rounded-full p-1 bg-slate-800">
+                    <img
+                      src="/developer.jpg"
+                      alt="Developer"
+                      className="w-24 h-24 rounded-full object-cover border-2 border-slate-700/50"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="text-center mb-6">
+            <div className="text-center mb-8">
               <h3 className="text-2xl font-bold text-white mb-2">Developer</h3>
               <div
                 className="w-20 h-0.5 mx-auto"
@@ -702,31 +732,66 @@ function HomePage({ onGetStarted }) {
               ></div>
             </div>
 
-            <div className="space-y-4 text-center">
-              <div>
-                <p className="text-sm text-slate-400 mb-1">Name</p>
-                <p className="text-lg font-semibold text-slate-200">
+            <div className="space-y-5">
+              {/* Name */}
+              <div className="text-center">
+                <h4
+                  className="text-2xl font-bold mb-1"
+                  style={{
+                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
                   Jakaria Chowdhury Tajwone
-                </p>
+                </h4>
+                <p className="text-sm text-slate-400">Full Stack Developer</p>
               </div>
 
-              <div>
-                <p className="text-sm text-slate-400 mb-1">Department</p>
-                <p className="text-base font-medium text-slate-200">
+              {/* Department */}
+              <div
+                className="p-4 rounded-lg"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))",
+                  border: "1px solid rgba(59, 130, 246, 0.2)",
+                }}
+              >
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <GraduationCap className="w-4 h-4 text-blue-400" />
+                  <p className="text-xs font-medium text-blue-300 uppercase tracking-wider">
+                    Department
+                  </p>
+                </div>
+                <p className="text-base font-semibold text-white text-center">
                   Computer Science & Engineering
                 </p>
               </div>
 
-              <div>
-                <p className="text-sm text-slate-400 mb-1">Institution</p>
-                <p className="text-base font-medium text-slate-200">
+              {/* Institution */}
+              <div
+                className="p-4 rounded-lg"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))",
+                  border: "1px solid rgba(139, 92, 246, 0.2)",
+                }}
+              >
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Building2 className="w-4 h-4 text-purple-400" />
+                  <p className="text-xs font-medium text-purple-300 uppercase tracking-wider">
+                    Institution
+                  </p>
+                </div>
+                <p className="text-base font-semibold text-white text-center">
                   North East University Bangladesh
                 </p>
               </div>
 
               <div className="pt-4 border-t border-slate-700/50">
-                <p className="text-xs text-slate-500">
-                  Developed for NEUB Students
+                <p className="text-xs text-slate-500 text-center">
+                  Developed with ❤️ for NEUB Students
                 </p>
               </div>
             </div>
