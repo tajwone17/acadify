@@ -292,8 +292,8 @@ function CoverPage({ data, printRef }) {
         <div
           style={{
             width: "85%",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            display: "flex",
+            justifyContent: "space-between",
             gap: "6mm",
             marginBottom: "6mm",
           }}
@@ -304,6 +304,8 @@ function CoverPage({ data, printRef }) {
               border: "1px solid #001B2E",
               borderRadius: "3px",
               overflow: "hidden",
+              flex: "1",
+              minWidth: "0",
             }}
           >
             <div
@@ -364,6 +366,8 @@ function CoverPage({ data, printRef }) {
               border: "1px solid #001B2E",
               borderRadius: "3px",
               overflow: "hidden",
+              flex: "1",
+              minWidth: "0",
             }}
           >
             <div
