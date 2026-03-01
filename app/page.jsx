@@ -36,6 +36,17 @@ function CoverPage({ data, printRef }) {
         .toUpperCase()
     : "DATE NOT SET";
 
+  // Render different formats
+  if (data.format === "simple") {
+    return <SimpleCoverPage data={data} printRef={printRef} formattedDate={formattedDate} />;
+  }
+  
+  // Default: Classic format
+  return <ClassicCoverPage data={data} printRef={printRef} formattedDate={formattedDate} />;
+}
+
+// ─── Classic Format ────────────────────────────────────────────────────────────
+function ClassicCoverPage({ data, printRef, formattedDate }) {
   return (
     <div
       ref={printRef}
@@ -470,6 +481,243 @@ function CoverPage({ data, printRef }) {
   );
 }
 
+// ─── Simple Format ─────────────────────────────────────────────────────────────
+function SimpleCoverPage({ data, printRef, formattedDate }) {
+  return (
+    <div
+      ref={printRef}
+      id="cover-page-print"
+      style={{
+        width: "210mm",
+        minHeight: "297mm",
+        backgroundColor: "#FFFFFF",
+        fontFamily: "'Arial', 'Helvetica', sans-serif",
+        color: "#000000",
+        padding: "20mm 25mm",
+        boxSizing: "border-box",
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      {/* Watermark */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          opacity: 0.03,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <img
+          src="/NEUB%20Logo.png"
+          alt="Watermark"
+          style={{
+            width: "450px",
+            height: "450px",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+
+      {/* Top border line */}
+      <div
+        style={{
+          width: "100%",
+          height: "2px",
+          backgroundColor: "#000000",
+          marginBottom: "12mm",
+        }}
+      />
+
+      {/* University Header */}
+      <div style={{ textAlign: "center", marginBottom: "10mm", width: "100%" }}>
+        <img
+          src="/NEUB%20Logo.png"
+          alt="NEUB Logo"
+          style={{ 
+            width: "65px", 
+            height: "65px", 
+            marginBottom: "6mm",
+            display: "block",
+            marginLeft: "auto",
+            marginRight: "auto"
+          }}
+        />
+        <h1
+          style={{
+            fontSize: "20px",
+            fontWeight: "bold",
+            color: "#000000",
+            marginBottom: "4px",
+            textTransform: "uppercase",
+          }}
+        >
+          North East University Bangladesh
+        </h1>
+        <p style={{ fontSize: "11px", color: "#333333", marginTop: "3px" }}>
+          {data.departmentName || "Department of Computer Science & Engineering"}
+        </p>
+      </div>
+
+      {/* Simple line */}
+      <div
+        style={{
+          width: "60%",
+          height: "1px",
+          backgroundColor: "#cccccc",
+          marginBottom: "10mm",
+        }}
+      />
+
+      {/* Doc Type */}
+      <div
+        style={{
+          border: "1px solid #000000",
+          padding: "6px 25px",
+          marginBottom: "10mm",
+        }}
+      >
+        <p
+          style={{
+            fontSize: "14px",
+            fontWeight: "bold",
+            letterSpacing: "3px",
+            textTransform: "uppercase",
+            color: "#000000",
+          }}
+        >
+          {data.docType}
+        </p>
+      </div>
+
+      {/* Topic */}
+      <div style={{ textAlign: "center", marginBottom: "10mm", width: "85%" }}>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "#000000",
+            lineHeight: "1.4",
+            marginBottom: "8mm",
+          }}
+        >
+          {data.assignmentTopic || "Topic Not Specified"}
+        </h2>
+      </div>
+
+      {/* Course Info */}
+      <div
+        style={{
+          width: "85%",
+          padding: "8px 12px",
+          border: "1px solid #cccccc",
+          marginBottom: "12mm",
+          textAlign: "center",
+          backgroundColor: "#fafafa",
+        }}
+      >
+        <p style={{ fontSize: "11px", color: "#333333" }}>
+          <strong>Course Code:</strong> {data.courseCode || "CSE-XXX"}
+          {" | "}
+          <strong>Course Title:</strong> {data.courseTitle || "Not Specified"}
+        </p>
+      </div>
+
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* Submission Info */}
+      <div style={{ width: "100%", display: "flex", gap: "8mm", marginBottom: "10mm" }}>
+        <div
+          style={{
+            flex: 1,
+            padding: "10px 12px",
+            border: "1px solid #000000",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "9px",
+              color: "#666666",
+              textTransform: "uppercase",
+              marginBottom: "5px",
+              fontWeight: "600",
+            }}
+          >
+            Submitted To
+          </p>
+          <p style={{ fontSize: "12px", fontWeight: "bold", color: "#000000", marginBottom: "2px" }}>
+            {data.teacherName || "Teacher Name"}
+          </p>
+          <p style={{ fontSize: "10px", color: "#333333", marginBottom: "2px" }}>
+            {data.teacherDesignation || "Designation"}
+          </p>
+          <p style={{ fontSize: "9px", color: "#666666" }}>
+            {data.departmentName?.replace("Department of ", "") || "CSE"}
+          </p>
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            padding: "10px 12px",
+            border: "1px solid #000000",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "9px",
+              color: "#666666",
+              textTransform: "uppercase",
+              marginBottom: "5px",
+              fontWeight: "600",
+            }}
+          >
+            Submitted By
+          </p>
+          <p style={{ fontSize: "12px", fontWeight: "bold", color: "#000000", marginBottom: "2px" }}>
+            {data.studentName || "Student Name"}
+          </p>
+          <p style={{ fontSize: "9px", color: "#333333" }}>
+            <strong>ID:</strong>{" "}
+            <span style={{ color: "#333333", textDecoration: "none" }}>
+              {data.registrationId || "XXXX-XX-XXXX"}
+            </span>
+          </p>
+          <p style={{ fontSize: "9px", color: "#333333" }}>
+            <strong>Roll:</strong>{" "}
+            <span style={{ color: "#333333", textDecoration: "none" }}>
+              {data.rollNo || "XXXX"}
+            </span>
+          </p>
+          <p style={{ fontSize: "9px", color: "#666666" }}>
+            {data.semester || "Xth Semester"}
+          </p>
+        </div>
+      </div>
+
+      {/* Date */}
+      <div
+        style={{
+          width: "100%",
+          paddingTop: "8mm",
+          borderTop: "1px solid #000000",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: "10px", color: "#000000", fontWeight: "600" }}>
+          {formattedDate}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Input Component ───────────────────────────────────────────────────────────
 function FormInput({
   label,
@@ -819,6 +1067,7 @@ export default function Page() {
   const printRef = useRef(null);
   const [form, setForm] = useState({
     docType: "ASSIGNMENT",
+    format: "classic",
     departmentName: "Department of Computer Science & Engineering",
     courseCode: "CSE-463",
     courseTitle: "Machine Learning",
@@ -908,6 +1157,41 @@ export default function Page() {
                         Lab Report
                       </>
                     )}
+                  </button>
+                ))}
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Cover Page Style">
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { id: "classic", name: "Classic", icon: "📄" },
+                  { id: "simple", name: "Simple", icon: "📋" },
+                ].map((format) => (
+                  <button
+                    key={format.id}
+                    onClick={() => update("format")(format.id)}
+                    className="py-3 px-2 rounded-lg text-xs font-semibold transition-all duration-200 flex flex-col items-center gap-1"
+                    style={
+                      form.format === format.id
+                        ? {
+                            background:
+                              "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                            color: "#fff",
+                            border: "1px solid transparent",
+                            boxShadow:
+                              "0 4px 12px rgba(59, 130, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.2)",
+                            transform: "translateY(-1px)",
+                          }
+                        : {
+                            background: "rgba(15, 23, 42, 0.5)",
+                            color: "#94a3b8",
+                            border: "1px solid rgba(51, 65, 85, 0.8)",
+                          }
+                    }
+                  >
+                    <span className="text-xl">{format.icon}</span>
+                    <span>{format.name}</span>
                   </button>
                 ))}
               </div>
