@@ -38,11 +38,23 @@ function CoverPage({ data, printRef }) {
 
   // Render different formats
   if (data.format === "simple") {
-    return <SimpleCoverPage data={data} printRef={printRef} formattedDate={formattedDate} />;
+    return (
+      <SimpleCoverPage
+        data={data}
+        printRef={printRef}
+        formattedDate={formattedDate}
+      />
+    );
   }
-  
+
   // Default: Classic format
-  return <ClassicCoverPage data={data} printRef={printRef} formattedDate={formattedDate} />;
+  return (
+    <ClassicCoverPage
+      data={data}
+      printRef={printRef}
+      formattedDate={formattedDate}
+    />
+  );
 }
 
 // ─── Classic Format ────────────────────────────────────────────────────────────
@@ -539,13 +551,13 @@ function SimpleCoverPage({ data, printRef, formattedDate }) {
         <img
           src="/NEUB%20Logo.png"
           alt="NEUB Logo"
-          style={{ 
-            width: "65px", 
-            height: "65px", 
+          style={{
+            width: "65px",
+            height: "65px",
             marginBottom: "6mm",
             display: "block",
             marginLeft: "auto",
-            marginRight: "auto"
+            marginRight: "auto",
           }}
         />
         <h1
@@ -560,7 +572,8 @@ function SimpleCoverPage({ data, printRef, formattedDate }) {
           North East University Bangladesh
         </h1>
         <p style={{ fontSize: "11px", color: "#333333", marginTop: "3px" }}>
-          {data.departmentName || "Department of Computer Science & Engineering"}
+          {data.departmentName ||
+            "Department of Computer Science & Engineering"}
         </p>
       </div>
 
@@ -632,7 +645,14 @@ function SimpleCoverPage({ data, printRef, formattedDate }) {
       <div style={{ flex: 1 }} />
 
       {/* Submission Info */}
-      <div style={{ width: "100%", display: "flex", gap: "8mm", marginBottom: "10mm" }}>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          gap: "8mm",
+          marginBottom: "10mm",
+        }}
+      >
         <div
           style={{
             flex: 1,
@@ -651,10 +671,19 @@ function SimpleCoverPage({ data, printRef, formattedDate }) {
           >
             Submitted To
           </p>
-          <p style={{ fontSize: "12px", fontWeight: "bold", color: "#000000", marginBottom: "2px" }}>
+          <p
+            style={{
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: "#000000",
+              marginBottom: "2px",
+            }}
+          >
             {data.teacherName || "Teacher Name"}
           </p>
-          <p style={{ fontSize: "10px", color: "#333333", marginBottom: "2px" }}>
+          <p
+            style={{ fontSize: "10px", color: "#333333", marginBottom: "2px" }}
+          >
             {data.teacherDesignation || "Designation"}
           </p>
           <p style={{ fontSize: "9px", color: "#666666" }}>
@@ -680,7 +709,14 @@ function SimpleCoverPage({ data, printRef, formattedDate }) {
           >
             Submitted By
           </p>
-          <p style={{ fontSize: "12px", fontWeight: "bold", color: "#000000", marginBottom: "2px" }}>
+          <p
+            style={{
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: "#000000",
+              marginBottom: "2px",
+            }}
+          >
             {data.studentName || "Student Name"}
           </p>
           <p style={{ fontSize: "9px", color: "#333333" }}>
