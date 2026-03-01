@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 📚 Acadify
 
-## Getting Started
+**Academic Document Creator for NEUB Students**
 
-First, run the development server:
+A modern, responsive web application designed specifically for North East University Bangladesh (NEUB) students to create professional academic cover pages for assignments, lab reports, and thesis papers.
+
+## 🌐 Live Demo
+
+**[https://acadify-silk.vercel.app/](https://acadify-silk.vercel.app/)**
+
+## ✨ Features
+
+- 🎨 **Professional Cover Pages** - Generate beautifully formatted A4-sized academic cover pages
+- 📝 **Multiple Document Types** - Support for Assignments, Lab Reports, and Thesis Papers
+- 🎯 **Multi-Step Form** - Easy-to-use 4-step wizard for entering document details
+- 📱 **Fully Responsive** - Works seamlessly on desktop, tablet, and mobile devices
+- 🖨️ **Print & Download** - One-click PDF generation and printing
+- 🎭 **University Branding** - Official NEUB logo and watermark integration
+- ✏️ **Live Preview** - Real-time preview of your document as you type
+- 🌟 **Modern UI** - Clean, gradient-based design with glassmorphism effects
+- 🚀 **Fast & Lightweight** - Built with Next.js for optimal performance
+
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js 15](https://nextjs.org/)
+- **UI Library:** [React 19](https://react.dev/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Font:** [Geist](https://vercel.com/font)
+- **Deployment:** [Vercel](https://vercel.com/)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and pnpm (or npm/yarn)
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/acadify.git
+cd acadify
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+# or
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Run the development server:
 
-## Learn More
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📖 Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Visit the Homepage** - Click "Get Started" to begin
+2. **Step 1: Document Details** - Enter document type, department, course code, and title
+3. **Step 2: Topic & Assignment** - Add your assignment/topic details and submission date
+4. **Step 3: Instructor Information** - Fill in teacher's name and designation
+5. **Step 4: Student Information** - Enter your name, ID, section, semester, and batch
+6. **Generate PDF** - Click "Generate PDF" to preview and print your cover page
 
-## Deploy on Vercel
+## 📁 Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+acadify/
+├── app/
+│   ├── globals.css      # Global styles
+│   ├── layout.js        # Root layout with metadata
+│   └── page.jsx         # Main application component
+├── public/
+│   ├── logo.png         # Acadify logo
+│   ├── NEUB Logo.png    # University logo
+│   └── developer.jpg    # Developer profile picture
+├── package.json
+└── README.md
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎨 Key Components
+
+- **HomePage** - Landing page with features and call-to-action
+- **CoverPage** - A4-formatted document with NEUB branding
+- **FormInput** - Reusable input components with icons
+- **SectionCard** - Form section containers with gradient headers
+- **DeveloperModal** - Information about the developer
+
+## 👨‍💻 Developer
+
+**Jakaria Chowdhury Tajwone**  
+Full Stack Developer  
+Computer Science & Engineering  
+North East University Bangladesh
+
+## 📄 License
+
+This project is created for educational purposes for NEUB students.
+
+## 🙏 Acknowledgments
+
+- North East University Bangladesh for institutional support
+- All NEUB students who inspired this project
+
+---
+
+**Made with ❤️ for NEUB Students**
