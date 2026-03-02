@@ -1116,13 +1116,62 @@ export default function Page() {
 
     setIsPdfGenerating(true);
 
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isIOS) {
+      // ── iOS Safari: inject a print-only style on the main page ──────
+      // iOS WebKit cannot print iframe/popup content — blank page bug.
+      // Instead we show ONLY the cover page via @media print on this page.
+      const styleEl = document.createElement("style");
+      styleEl.id = "acadify-ios-print";
+      styleEl.innerHTML = `
+        @media print {
+          @page { size: A4; margin: 0; }
+          body > * { display: none !important; }
+          #cover-page-print {
+            display: flex !important;
+            position: fixed !important;
+            inset: 0 !important;
+            transform: none !important;
+            margin: 0 !important;
+            z-index: 99999 !important;
+          }
+        }
+      `;
+      document.head.appendChild(styleEl);
+
+      // Briefly let the style apply, then print
+      setTimeout(() => {
+        window.print();
+        // Clean up after the print dialog closes
+        const cleanup = () => {
+          styleEl.remove();
+          setIsPdfGenerating(false);
+          window.removeEventListener("afterprint", cleanup);
+        };
+        window.addEventListener("afterprint", cleanup);
+        // Safety timeout in case afterprint never fires on older iOS
+        setTimeout(() => {
+          if (document.getElementById("acadify-ios-print")) {
+            styleEl.remove();
+            setIsPdfGenerating(false);
+          }
+        }, 10000);
+      }, 100);
+
+      return;
+    }
+
+    // ── Android + Desktop: hidden iframe (never blocked, always works) ──
     const coverHTML = printContent.outerHTML;
+    const baseHref = window.location.origin + "/";
 
     const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <base href="${baseHref}" />
   <title>Acadify Cover Page</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1133,8 +1182,6 @@ export default function Page() {
 <body>${coverHTML}</body>
 </html>`;
 
-    // Use a hidden iframe — works on all browsers including mobile.
-    // Popups are blocked on mobile; iframes are never blocked.
     const iframe = document.createElement("iframe");
     iframe.style.cssText =
       "position:fixed;top:0;left:0;width:1px;height:1px;border:none;opacity:0;pointer-events:none;";
@@ -1153,7 +1200,6 @@ export default function Page() {
       doc.write(htmlContent);
       doc.close();
 
-      // Wait for images/fonts inside the iframe to load, then print
       iframe.contentWindow.onload = () => {
         setTimeout(() => {
           iframe.contentWindow.focus();
@@ -1162,14 +1208,14 @@ export default function Page() {
         }, 300);
       };
 
-      // Safety fallback if onload doesn't fire (e.g. some Android browsers)
+      // Safety fallback if onload doesn't fire
       setTimeout(() => {
         try {
           iframe.contentWindow.focus();
           iframe.contentWindow.print();
         } catch (_) {}
         cleanup();
-      }, 1500);
+      }, 1800);
     } catch (err) {
       console.error("Print failed:", err);
       cleanup();
