@@ -434,14 +434,6 @@ function ClassicCoverPage({ data, printRef, formattedDate }) {
                   {data.registrationId || "XXXX-XX-XXXX"}
                 </span>
               </p>
-              <p
-                style={{ fontSize: "10px", color: "#555", marginBottom: "2px" }}
-              >
-                <strong>Roll:</strong>{" "}
-                <span style={{ color: "#555", textDecoration: "none" }}>
-                  {data.rollNo || "XXXX"}
-                </span>
-              </p>
               <p style={{ fontSize: "10px", color: "#555" }}>
                 <strong>Semester:</strong> {data.semester || "Xth Semester"}
               </p>
@@ -723,12 +715,6 @@ function SimpleCoverPage({ data, printRef, formattedDate }) {
             <strong>ID:</strong>{" "}
             <span style={{ color: "#333333", textDecoration: "none" }}>
               {data.registrationId || "XXXX-XX-XXXX"}
-            </span>
-          </p>
-          <p style={{ fontSize: "9px", color: "#333333" }}>
-            <strong>Roll:</strong>{" "}
-            <span style={{ color: "#333333", textDecoration: "none" }}>
-              {data.rollNo || "XXXX"}
             </span>
           </p>
           <p style={{ fontSize: "9px", color: "#666666" }}>
@@ -1112,7 +1098,6 @@ export default function Page() {
     teacherDesignation: "Head & Associate Professor",
     studentName: "Md. Rakib Hassan",
     registrationId: "2021-1-60-003",
-    rollNo: "2021331060003",
     semester: "8th Semester",
     date: new Date().toISOString().split("T")[0],
   });
@@ -1124,27 +1109,54 @@ export default function Page() {
     [],
   );
 
-  const handlePrint = () => {
-    const printContent = document.getElementById("cover-page-print");
-    if (!printContent) return;
-    const win = window.open("", "_blank", "width=900,height=700");
-    if (!win) return;
-    win.document.write(`
-      <html><head><title>Cover Page - NEUB</title>
-      <style>
-        @page { size: A4; margin: 0; }
-        body { margin: 0; padding: 0; }
-        * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      </style></head>
-      <body>${printContent.outerHTML}</body></html>
-    `);
-    win.document.close();
-    win.focus();
-    setTimeout(() => {
-      win.print();
-      win.close();
-    }, 500);
+ const handlePrint = () => {
+  const printContent = document.getElementById("cover-page-print");
+  if (!printContent) return;
+
+  // Inject print-only style that hides everything except the cover page
+  const styleId = "acadify-print-style";
+  let style = document.getElementById(styleId);
+  if (!style) {
+    style = document.createElement("style");
+    style.id = styleId;
+    document.head.appendChild(style);
+  }
+
+  style.innerHTML = `
+    @media print {
+      @page { size: A4; margin: 0; }
+      body > * { display: none !important; }
+      #acadify-print-root { display: block !important; }
+    }
+  `;
+
+  // Create a dedicated print root if it doesn't exist
+  let printRoot = document.getElementById("acadify-print-root");
+  if (!printRoot) {
+    printRoot = document.createElement("div");
+    printRoot.id = "acadify-print-root";
+    printRoot.style.cssText = "display:none; position:fixed; inset:0; z-index:99999; background:white;";
+    document.body.appendChild(printRoot);
+  }
+
+  // Clone the cover page into the print root — NO "as HTMLElement" cast
+  printRoot.innerHTML = "";
+  const clone = printContent.cloneNode(true);  
+  clone.style.transform = "none";
+  clone.style.position = "static";
+  printRoot.appendChild(clone);
+
+  // Trigger print directly — works on Android Chrome
+  window.print();
+
+  // Cleanup after print dialog closes
+  const cleanup = () => {
+    style.innerHTML = "";
+    printRoot.innerHTML = "";
+    window.removeEventListener("afterprint", cleanup);
   };
+  window.addEventListener("afterprint", cleanup);
+};
 
   // Show home page
   if (currentView === "home") {
@@ -1302,22 +1314,13 @@ export default function Page() {
                 onChange={update("studentName")}
                 placeholder="Md. Rakib Hassan"
               />
-              <div className="grid grid-cols-2 gap-3">
-                <FormInput
-                  label="Registration ID"
-                  icon={IdCard}
-                  value={form.registrationId}
-                  onChange={update("registrationId")}
-                  placeholder="2021-1-60-003"
-                />
-                <FormInput
-                  label="Roll No."
-                  icon={Hash}
-                  value={form.rollNo}
-                  onChange={update("rollNo")}
-                  placeholder="2021331060003"
-                />
-              </div>
+              <FormInput
+                label="Registration ID"
+                icon={IdCard}
+                value={form.registrationId}
+                onChange={update("registrationId")}
+                placeholder="2021-1-60-003"
+              />
               <FormInput
                 label="Semester"
                 icon={Clock}
