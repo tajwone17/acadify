@@ -1110,110 +1110,73 @@ export default function Page() {
     [],
   );
 
-  const handlePrint = async () => {
+  const handlePrint = () => {
     const printContent = document.getElementById("cover-page-print");
     if (!printContent || isPdfGenerating) return;
 
-    const isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      );
-
-    if (!isMobile) {
-      // ── Desktop: use native print dialog (Save as PDF) ──────────────
-      const styleId = "acadify-print-style";
-      let style = document.getElementById(styleId);
-      if (!style) {
-        style = document.createElement("style");
-        style.id = styleId;
-        document.head.appendChild(style);
-      }
-      style.innerHTML = `
-        @media print {
-          @page { size: A4; margin: 0; }
-          body > * { display: none !important; }
-          #acadify-print-root { display: block !important; }
-        }
-      `;
-      let printRoot = document.getElementById("acadify-print-root");
-      if (!printRoot) {
-        printRoot = document.createElement("div");
-        printRoot.id = "acadify-print-root";
-        printRoot.style.cssText =
-          "display:none; position:fixed; inset:0; z-index:99999; background:white;";
-        document.body.appendChild(printRoot);
-      }
-      printRoot.innerHTML = "";
-      const clone = printContent.cloneNode(true);
-      clone.style.transform = "none";
-      clone.style.position = "static";
-      printRoot.appendChild(clone);
-      window.print();
-      const cleanup = () => {
-        style.innerHTML = "";
-        printRoot.innerHTML = "";
-        window.removeEventListener("afterprint", cleanup);
-      };
-      window.addEventListener("afterprint", cleanup);
-      return;
-    }
-
-    // ── Mobile: generate a real PDF file via CDN libraries ───────────
     setIsPdfGenerating(true);
+
     try {
-      const loadScript = (src) =>
-        new Promise((resolve, reject) => {
-          if (document.querySelector(`script[src="${src}"]`)) {
-            resolve();
-            return;
-          }
-          const s = document.createElement("script");
-          s.src = src;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
+      // Collect all inline styles from the cover page element
+      const coverHTML = printContent.outerHTML;
 
-      await loadScript(
-        "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
-      );
-      await loadScript(
-        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
-      );
+      // Check if it's iOS (Safari popup print doesn't work — open new tab instead)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-      // Temporarily remove any scaling transform so we capture at native size
-      const originalTransform = printContent.style.transform;
-      printContent.style.transform = "none";
+      const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acadify Cover Page</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #fff; display: flex; justify-content: center; }
+    @page { size: A4; margin: 0; }
+    @media print {
+      html, body { width: 210mm; height: 297mm; }
+      body { display: block; }
+    }
+  </style>
+</head>
+<body>
+  ${coverHTML}
+  ${isIOS ? "" : "<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<\/script>"}
+</body>
+</html>`;
 
-      const canvas = await window.html2canvas(printContent, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-      });
-
-      printContent.style.transform = originalTransform;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-      const pageW = 210;
-      const pageH = (canvas.height * pageW) / canvas.width;
-      pdf.addImage(imgData, "JPEG", 0, 0, pageW, Math.min(pageH, 297));
-
-      const fileName = `acadify-cover-${form.studentName?.replace(/\s+/g, "-") || "page"}.pdf`;
-      pdf.save(fileName);
+      if (isIOS) {
+        // iOS Safari: open new tab — user uses Share > Print to save PDF
+        const blob = new Blob([htmlContent], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      } else {
+        // All other browsers (desktop + Android): open popup and auto-print
+        const popup = window.open("", "_blank", "width=900,height=1200");
+        if (!popup) {
+          // Popup blocked — fall back to same-page print
+          const blob = new Blob([htmlContent], { type: "text/html" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        } else {
+          popup.document.open();
+          popup.document.write(htmlContent);
+          popup.document.close();
+        }
+      }
     } catch (err) {
       console.error("PDF generation failed:", err);
-      alert(
-        "Could not generate PDF. Please check your internet connection and try again.",
-      );
+      alert("Something went wrong. Please try again.");
     } finally {
       setIsPdfGenerating(false);
     }
@@ -1587,7 +1550,7 @@ export default function Page() {
             }}
           >
             <Printer size={16} />
-            {isPdfGenerating ? "Generating PDF…" : "Download PDF"}
+            {isPdfGenerating ? "Generating PDF…" : "Save as PDF"}
           </button>
         </div>
 
