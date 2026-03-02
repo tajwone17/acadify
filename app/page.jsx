@@ -834,7 +834,7 @@ function HomePage({ onGetStarted }) {
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-2xl blur-xl"></div>
+              <div className="absolute inset-0 bg-linear-to-br from-blue-500/30 to-purple-500/30 rounded-2xl blur-xl"></div>
               <img
                 src="/logo.png"
                 alt="Acadify Logo"
@@ -844,7 +844,7 @@ function HomePage({ onGetStarted }) {
             </div>
           </div>
           <h1
-            className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text"
+            className="text-5xl font-bold mb-4 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text"
             style={{ WebkitTextFillColor: "transparent" }}
           >
             Acadify
@@ -907,7 +907,7 @@ function HomePage({ onGetStarted }) {
         {/* Get Started Button */}
         <button
           onClick={onGetStarted}
-          className="flex items-center gap-3 px-8 py-4 rounded-xl text-lg font-semibold text-white transition-all duration-200 hover:shadow-2xl hover:shadow-blue-500/40 active:scale-95"
+          className="flex cursor pointer  items-center gap-3 px-8 py-4 rounded-xl text-lg font-semibold text-white transition-all duration-200 hover:shadow-2xl hover:shadow-blue-500/40 active:scale-95"
           style={{
             background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
             boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
@@ -1087,6 +1087,7 @@ export default function Page() {
   const [currentView, setCurrentView] = useState("home"); // "home" or "editor"
   const [currentStep, setCurrentStep] = useState(1); // 1, 2, 3, 4
   const printRef = useRef(null);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [form, setForm] = useState({
     docType: "ASSIGNMENT",
     format: "classic",
@@ -1109,54 +1110,113 @@ export default function Page() {
     [],
   );
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     const printContent = document.getElementById("cover-page-print");
-    if (!printContent) return;
+    if (!printContent || isPdfGenerating) return;
 
-    // Inject print-only style that hides everything except the cover page
-    const styleId = "acadify-print-style";
-    let style = document.getElementById(styleId);
-    if (!style) {
-      style = document.createElement("style");
-      style.id = styleId;
-      document.head.appendChild(style);
-    }
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent,
+      );
 
-    style.innerHTML = `
-    @media print {
-      @page { size: A4; margin: 0; }
-      body > * { display: none !important; }
-      #acadify-print-root { display: block !important; }
-    }
-  `;
-
-    // Create a dedicated print root if it doesn't exist
-    let printRoot = document.getElementById("acadify-print-root");
-    if (!printRoot) {
-      printRoot = document.createElement("div");
-      printRoot.id = "acadify-print-root";
-      printRoot.style.cssText =
-        "display:none; position:fixed; inset:0; z-index:99999; background:white;";
-      document.body.appendChild(printRoot);
-    }
-
-    // Clone the cover page into the print root — NO "as HTMLElement" cast
-    printRoot.innerHTML = "";
-    const clone = printContent.cloneNode(true);
-    clone.style.transform = "none";
-    clone.style.position = "static";
-    printRoot.appendChild(clone);
-
-    // Trigger print directly — works on Android Chrome
-    window.print();
-
-    // Cleanup after print dialog closes
-    const cleanup = () => {
-      style.innerHTML = "";
+    if (!isMobile) {
+      // ── Desktop: use native print dialog (Save as PDF) ──────────────
+      const styleId = "acadify-print-style";
+      let style = document.getElementById(styleId);
+      if (!style) {
+        style = document.createElement("style");
+        style.id = styleId;
+        document.head.appendChild(style);
+      }
+      style.innerHTML = `
+        @media print {
+          @page { size: A4; margin: 0; }
+          body > * { display: none !important; }
+          #acadify-print-root { display: block !important; }
+        }
+      `;
+      let printRoot = document.getElementById("acadify-print-root");
+      if (!printRoot) {
+        printRoot = document.createElement("div");
+        printRoot.id = "acadify-print-root";
+        printRoot.style.cssText =
+          "display:none; position:fixed; inset:0; z-index:99999; background:white;";
+        document.body.appendChild(printRoot);
+      }
       printRoot.innerHTML = "";
-      window.removeEventListener("afterprint", cleanup);
-    };
-    window.addEventListener("afterprint", cleanup);
+      const clone = printContent.cloneNode(true);
+      clone.style.transform = "none";
+      clone.style.position = "static";
+      printRoot.appendChild(clone);
+      window.print();
+      const cleanup = () => {
+        style.innerHTML = "";
+        printRoot.innerHTML = "";
+        window.removeEventListener("afterprint", cleanup);
+      };
+      window.addEventListener("afterprint", cleanup);
+      return;
+    }
+
+    // ── Mobile: generate a real PDF file via CDN libraries ───────────
+    setIsPdfGenerating(true);
+    try {
+      const loadScript = (src) =>
+        new Promise((resolve, reject) => {
+          if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+          }
+          const s = document.createElement("script");
+          s.src = src;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+      );
+
+      // Temporarily remove any scaling transform so we capture at native size
+      const originalTransform = printContent.style.transform;
+      printContent.style.transform = "none";
+
+      const canvas = await window.html2canvas(printContent, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
+
+      printContent.style.transform = originalTransform;
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      const pageW = 210;
+      const pageH = (canvas.height * pageW) / canvas.width;
+      pdf.addImage(imgData, "JPEG", 0, 0, pageW, Math.min(pageH, 297));
+
+      const fileName = `acadify-cover-${form.studentName?.replace(/\s+/g, "-") || "page"}.pdf`;
+      pdf.save(fileName);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert(
+        "Could not generate PDF. Please check your internet connection and try again.",
+      );
+    } finally {
+      setIsPdfGenerating(false);
+    }
   };
 
   // Show home page
@@ -1407,15 +1467,20 @@ export default function Page() {
           </span>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex-1 sm:flex-none justify-center"
+            disabled={isPdfGenerating}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex-1 sm:flex-none justify-center disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
               boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
             }}
           >
             <Printer size={14} />{" "}
-            <span className="hidden sm:inline">Print / Save PDF</span>
-            <span className="sm:hidden">Print</span>
+            <span className="hidden sm:inline">
+              {isPdfGenerating ? "Generating…" : "Print / Save PDF"}
+            </span>
+            <span className="sm:hidden">
+              {isPdfGenerating ? "…" : "Print"}
+            </span>
           </button>
         </div>
       </header>
@@ -1500,27 +1565,31 @@ export default function Page() {
             ) : (
               <button
                 onClick={handlePrint}
-                className="flex-1 py-3 rounded-lg font-semibold text-sm text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex items-center justify-center gap-2"
+                disabled={isPdfGenerating}
+                className="flex-1 py-3 rounded-lg font-semibold text-sm text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{
                   background: "linear-gradient(135deg, #10b981, #059669)",
                   boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
                 }}
               >
-                <Printer size={16} /> Generate PDF
+                <Printer size={16} />
+                {isPdfGenerating ? "Generating PDF…" : "Generate PDF"}
               </button>
             )}
           </div>
 
-          {/* Print Button for mobile */}
+          {/* Download PDF Button for mobile */}
           <button
             onClick={handlePrint}
-            className="w-full py-3.5 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 lg:hidden"
+            disabled={isPdfGenerating}
+            className="w-full py-3.5 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 lg:hidden disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
               boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
             }}
           >
-            <Printer size={16} /> Generate & Print PDF
+            <Printer size={16} />
+            {isPdfGenerating ? "Generating PDF…" : "Download PDF"}
           </button>
         </div>
 
