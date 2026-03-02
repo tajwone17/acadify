@@ -1478,9 +1478,7 @@ export default function Page() {
             <span className="hidden sm:inline">
               {isPdfGenerating ? "Generating…" : "Print / Save PDF"}
             </span>
-            <span className="sm:hidden">
-              {isPdfGenerating ? "…" : "Print"}
-            </span>
+            <span className="sm:hidden">{isPdfGenerating ? "…" : "Print"}</span>
           </button>
         </div>
       </header>
