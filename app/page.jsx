@@ -1109,20 +1109,20 @@ export default function Page() {
     [],
   );
 
- const handlePrint = () => {
-  const printContent = document.getElementById("cover-page-print");
-  if (!printContent) return;
+  const handlePrint = () => {
+    const printContent = document.getElementById("cover-page-print");
+    if (!printContent) return;
 
-  // Inject print-only style that hides everything except the cover page
-  const styleId = "acadify-print-style";
-  let style = document.getElementById(styleId);
-  if (!style) {
-    style = document.createElement("style");
-    style.id = styleId;
-    document.head.appendChild(style);
-  }
+    // Inject print-only style that hides everything except the cover page
+    const styleId = "acadify-print-style";
+    let style = document.getElementById(styleId);
+    if (!style) {
+      style = document.createElement("style");
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
 
-  style.innerHTML = `
+    style.innerHTML = `
     @media print {
       @page { size: A4; margin: 0; }
       body > * { display: none !important; }
@@ -1130,33 +1130,34 @@ export default function Page() {
     }
   `;
 
-  // Create a dedicated print root if it doesn't exist
-  let printRoot = document.getElementById("acadify-print-root");
-  if (!printRoot) {
-    printRoot = document.createElement("div");
-    printRoot.id = "acadify-print-root";
-    printRoot.style.cssText = "display:none; position:fixed; inset:0; z-index:99999; background:white;";
-    document.body.appendChild(printRoot);
-  }
+    // Create a dedicated print root if it doesn't exist
+    let printRoot = document.getElementById("acadify-print-root");
+    if (!printRoot) {
+      printRoot = document.createElement("div");
+      printRoot.id = "acadify-print-root";
+      printRoot.style.cssText =
+        "display:none; position:fixed; inset:0; z-index:99999; background:white;";
+      document.body.appendChild(printRoot);
+    }
 
-  // Clone the cover page into the print root — NO "as HTMLElement" cast
-  printRoot.innerHTML = "";
-  const clone = printContent.cloneNode(true);  
-  clone.style.transform = "none";
-  clone.style.position = "static";
-  printRoot.appendChild(clone);
-
-  // Trigger print directly — works on Android Chrome
-  window.print();
-
-  // Cleanup after print dialog closes
-  const cleanup = () => {
-    style.innerHTML = "";
+    // Clone the cover page into the print root — NO "as HTMLElement" cast
     printRoot.innerHTML = "";
-    window.removeEventListener("afterprint", cleanup);
+    const clone = printContent.cloneNode(true);
+    clone.style.transform = "none";
+    clone.style.position = "static";
+    printRoot.appendChild(clone);
+
+    // Trigger print directly — works on Android Chrome
+    window.print();
+
+    // Cleanup after print dialog closes
+    const cleanup = () => {
+      style.innerHTML = "";
+      printRoot.innerHTML = "";
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
   };
-  window.addEventListener("afterprint", cleanup);
-};
 
   // Show home page
   if (currentView === "home") {
