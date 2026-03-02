@@ -1116,14 +1116,9 @@ export default function Page() {
 
     setIsPdfGenerating(true);
 
-    try {
-      // Collect all inline styles from the cover page element
-      const coverHTML = printContent.outerHTML;
+    const coverHTML = printContent.outerHTML;
 
-      // Check if it's iOS (Safari popup print doesn't work — open new tab instead)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-      const htmlContent = `<!DOCTYPE html>
+    const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
@@ -1131,54 +1126,53 @@ export default function Page() {
   <title>Acadify Cover Page</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #fff; display: flex; justify-content: center; }
+    body { background: #fff; }
     @page { size: A4; margin: 0; }
-    @media print {
-      html, body { width: 210mm; height: 297mm; }
-      body { display: block; }
-    }
   </style>
 </head>
-<body>
-  ${coverHTML}
-  ${isIOS ? "" : "<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<\/script>"}
-</body>
+<body>${coverHTML}</body>
 </html>`;
 
-      if (isIOS) {
-        // iOS Safari: open new tab — user uses Share > Print to save PDF
-        const blob = new Blob([htmlContent], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.target = "_blank";
-        a.rel = "noopener";
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-      } else {
-        // All other browsers (desktop + Android): open popup and auto-print
-        const popup = window.open("", "_blank", "width=900,height=1200");
-        if (!popup) {
-          // Popup blocked — fall back to same-page print
-          const blob = new Blob([htmlContent], { type: "text/html" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.target = "_blank";
-          a.rel = "noopener";
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(url), 10000);
-        } else {
-          popup.document.open();
-          popup.document.write(htmlContent);
-          popup.document.close();
-        }
-      }
+    // Use a hidden iframe — works on all browsers including mobile.
+    // Popups are blocked on mobile; iframes are never blocked.
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText =
+      "position:fixed;top:0;left:0;width:1px;height:1px;border:none;opacity:0;pointer-events:none;";
+    document.body.appendChild(iframe);
+
+    const cleanup = () => {
+      setTimeout(() => {
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+        setIsPdfGenerating(false);
+      }, 500);
+    };
+
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(htmlContent);
+      doc.close();
+
+      // Wait for images/fonts inside the iframe to load, then print
+      iframe.contentWindow.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          cleanup();
+        }, 300);
+      };
+
+      // Safety fallback if onload doesn't fire (e.g. some Android browsers)
+      setTimeout(() => {
+        try {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        } catch (_) {}
+        cleanup();
+      }, 1500);
     } catch (err) {
-      console.error("PDF generation failed:", err);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsPdfGenerating(false);
+      console.error("Print failed:", err);
+      cleanup();
     }
   };
 
